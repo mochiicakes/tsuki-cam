@@ -30,22 +30,11 @@ import { seasonalStyles } from '../lib/frameDecor'
 import { moonPhase } from '../lib/moon'
 import BrandHeader from '../components/BrandHeader'
 import Segmented from '../components/Segmented'
+import Toggle from '../components/Toggle'
 
 const ASPECT_ICONS = { portrait: RectangleVertical, square: Square, landscape: RectangleHorizontal }
 const FRAME_ICONS = { classic: Frame, none: SquareDashed }
 
-const Checkbox = ({ checked, onChange, disabled, children }) => (
-  <label className={`mt-3 flex items-center gap-3 text-ink ${disabled ? 'opacity-50' : 'cursor-pointer'}`}>
-    <input
-      type="checkbox"
-      checked={checked}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.checked)}
-      className="w-5 h-5 accent-[var(--accent)]"
-    />
-    {children}
-  </label>
-)
 const ROW_ICONS = { 1: RectangleVertical, 2: Rows2, 3: Rows3, 4: Rows4 }
 const layoutIcon = (id, count) => {
   if (id === 'grid') return LayoutGrid
@@ -350,16 +339,16 @@ const CustomizationPage = () => {
                   aria-label="Caption"
                   className="w-full p-4 border border-line rounded-xl bg-paper text-ink placeholder:text-ink-soft/60 focus:outline-none focus:ring-2 focus:ring-gold transition-all duration-200 disabled:opacity-50"
                 />
-                <div className="mt-1">
-                  <Checkbox checked={showDate} disabled={!framed} onChange={(v) => update({ showDate: v })}>
+                <div className="mt-4 space-y-3">
+                  <Toggle checked={showDate} disabled={!framed} onChange={(v) => update({ showDate: v })}>
                     Show today’s date
-                  </Checkbox>
-                  <Checkbox checked={showMoon} disabled={!framed || !showDate} onChange={(v) => update({ showMoon: v })}>
+                  </Toggle>
+                  <Toggle checked={showMoon} disabled={!framed || !showDate} onChange={(v) => update({ showMoon: v })}>
                     Add tonight’s moon <span className="text-gold">{tonight.ja}</span>
-                  </Checkbox>
-                  <Checkbox checked={filmDate} onChange={(v) => update({ filmDate: v })}>
+                  </Toggle>
+                  <Toggle checked={filmDate} onChange={(v) => update({ filmDate: v })}>
                     Film date stamp <span className="text-gold">日付</span>
-                  </Checkbox>
+                  </Toggle>
                 </div>
                 {!framed && <p className="mt-3 text-xs text-ink-soft">Captions and the date line appear on framed strips.</p>}
               </section>

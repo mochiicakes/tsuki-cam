@@ -51,8 +51,12 @@ const WebcamCapture = ({
   const settingsRef = useRef({ beauty, strength })
   const [status, setStatus] = useState('loading')
   const [attempt, setAttempt] = useState(0)
-  const [facing, setFacing] = useState('user')
-  const [canSwitch, setCanSwitch] = useState(false)
+  // null = let the browser pick the front camera; otherwise a specific camera's deviceId.
+  const [deviceId, setDeviceId] = useState(null)
+  const [cameras, setCameras] = useState([]) // [{ deviceId, label }]
+  const [currentId, setCurrentId] = useState(null)
+  const switchedRef = useRef(false)
+  const onMirrorChangeRef = useRef(onMirrorChange)
 
   useImperativeHandle(ref, () => ({
     // Resolves to a JPEG Blob of the current frame, flipped only if the preview is mirrored.
@@ -86,7 +90,11 @@ const WebcamCapture = ({
     setStatus('loading')
     navigator.mediaDevices
       .getUserMedia({
-        video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: {
+          ...(deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: 'user' } }),
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        },
         audio: false,
       })
       .then(async (s) => {
@@ -104,12 +112,31 @@ const WebcamCapture = ({
         }
         if (!active) return
         setStatus('ready')
+
+        const settings = s.getVideoTracks()[0]?.getSettings?.() ?? {}
+        setCurrentId(settings.deviceId ?? null)
+        // After a switch, mirror front cameras and un-mirror back ones. Laptop/USB cameras
+        // don't report a direction, so the user's mirror choice is left alone.
+        if (switchedRef.current && settings.facingMode) onMirrorChangeRef.current?.(settings.facingMode !== 'environment')
+        switchedRef.current = false
+
         // Devices are only fully listed once permission is granted.
         const devices = await navigator.mediaDevices.enumerateDevices().catch(() => [])
-        if (active) setCanSwitch(devices.filter((d) => d.kind === 'videoinput').length > 1)
+        if (active) {
+          setCameras(
+            devices
+              .filter((d) => d.kind === 'videoinput' && d.deviceId)
+              .map((d, i) => ({ deviceId: d.deviceId, label: d.label || `Camera ${i + 1}` })),
+          )
+        }
       })
       .catch((err) => {
         if (!active) return
+        // A chosen camera that disappeared (unplugged) falls back to the default one.
+        if (deviceId && (err?.name === 'OverconstrainedError' || err?.name === 'NotFoundError')) {
+          setDeviceId(null)
+          return
+        }
         setStatus(err?.name === 'NotAllowedError' || err?.name === 'SecurityError' ? 'denied' : 'unavailable')
       })
 
@@ -118,18 +145,23 @@ const WebcamCapture = ({
       active = false
       stream?.getTracks().forEach((t) => t.stop())
     }
-  }, [attempt, facing])
+  }, [attempt, deviceId])
 
+  // Cycle through the actual cameras by deviceId. (facingMode alone does nothing on laptops
+  // and with USB/virtual cameras, which don't report a direction.)
+  const canSwitch = cameras.length > 1
+  const currentIndex = Math.max(0, cameras.findIndex((c) => c.deviceId === currentId))
+  const nextCamera = canSwitch ? cameras[(currentIndex + 1) % cameras.length] : null
   const switchCamera = () => {
-    const next = facing === 'user' ? 'environment' : 'user'
-    setFacing(next)
-    // Selfies read naturally mirrored; the back camera shouldn't be.
-    onMirrorChange?.(next === 'user')
+    if (!nextCamera) return
+    switchedRef.current = true
+    setDeviceId(nextCamera.deviceId)
   }
 
   useEffect(() => {
     settingsRef.current = { beauty, strength }
-  }, [beauty, strength])
+    onMirrorChangeRef.current = onMirrorChange
+  }, [beauty, strength, onMirrorChange])
 
   // Live pipeline: each camera frame -> beauty shader -> canvas (+ an unfiltered copy).
   useEffect(() => {
@@ -224,7 +256,13 @@ const WebcamCapture = ({
           {status === 'ready' && (
             <div className="absolute top-3 right-3 flex flex-col gap-2">
               {canSwitch && (
-                <button onClick={switchCamera} disabled={disabled} className={overlayButtonClass} aria-label="Switch camera" title="Switch camera">
+                <button
+                  onClick={switchCamera}
+                  disabled={disabled}
+                  className={overlayButtonClass}
+                  aria-label={`Switch camera to ${nextCamera.label}`}
+                  title={`Switch to ${nextCamera.label}`}
+                >
                   <SwitchCamera className="w-5 h-5" />
                 </button>
               )}

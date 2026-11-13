@@ -14,6 +14,7 @@ import PhotoThumb from '../components/PhotoThumb'
 import { BeautySliders, StrengthSlider } from '../components/LookControls'
 import ScreenLightPicker from '../components/ScreenLightPicker'
 import Segmented from '../components/Segmented'
+import Toggle from '../components/Toggle'
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -244,15 +245,13 @@ const PhotoCapturePage = () => {
                 <BeautySliders smooth={smooth} brighten={brighten} onChange={update} />
               </div>
               <div className="flex justify-center">
-                <label className="inline-flex items-center gap-2 text-sm font-medium text-ink cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={posePrompts}
-                    onChange={(e) => update({ posePrompts: e.target.checked })}
-                    className="w-4 h-4 accent-[var(--accent)]"
-                  />
+                <Toggle
+                  checked={posePrompts}
+                  onChange={(v) => update({ posePrompts: v })}
+                  className="w-full max-w-sm text-sm font-medium"
+                >
                   Pose ideas <span className="text-gold">ポーズ</span>
-                </label>
+                </Toggle>
               </div>
             </div>
 

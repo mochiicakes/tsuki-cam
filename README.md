@@ -11,7 +11,7 @@ A cute, moonlit photobooth that runs entirely in your browser. Snap photos with 
 ### Taking photos 撮る
 - **Camera or upload.** Take 1–4 photos, or drag in / pick your own.
 - **Self-timer.** Off, 3, 5 or 10 seconds. With a timer, Tsuki Cam counts down and fills every remaining shot automatically; you can cancel mid-way.
-- **Pose ideas ポーズ.** A cute suggestion before each shot (Peace ピース, 指ハート, ねこポーズ, うさ耳…). No repeats until all 16 have been shown; can be turned off.
+- **Pose ideas ポーズ.** A cute suggestion before each shot (Peace ピース, 指ハート, ねこポーズ, うさ耳…). No repeats until all 26 have been shown; can be turned off.
 - **Screen light ライト.** The whole screen glows pink, lilac, blue or white to light your face, like the Xiaohongshu screen-light trick. It goes fullscreen where the browser allows; turn your brightness all the way up.
 - **Mirror toggle.** Turn mirroring on or off; the saved photo always matches what you saw.
 - **Retake.** Remove any single shot or retake them all.

@@ -16,6 +16,16 @@ export const POSES = [
   { icon: '🌙', en: 'Look up at the moon', ja: 'お月見' },
   { icon: '😆', en: 'Big laugh', ja: '大笑い' },
   { icon: '🤳', en: 'Lean in close', ja: 'ぎゅっ' },
+  { icon: '🙃', en: 'Upside-down peace', ja: 'ギャルピース' },
+  { icon: '🐻', en: 'Bear ears', ja: 'くまポーズ' },
+  { icon: '🐶', en: 'Puppy paws', ja: 'わんこポーズ' },
+  { icon: '🐡', en: 'Puffy cheeks', ja: 'ぷくー' },
+  { icon: '🌸', en: 'Flower face', ja: 'お花ポーズ' },
+  { icon: '🎤', en: 'Idol pose', ja: 'アイドル' },
+  { icon: '🙏', en: 'Pretty please', ja: 'おねがい' },
+  { icon: '😪', en: 'Sleepy', ja: 'ねむねむ' },
+  { icon: '👀', en: 'Look away', ja: 'よそ見' },
+  { icon: '👯', en: 'Back to back', ja: '背中合わせ' },
 ]
 
 /** Returns `count` poses in random order, without repeats (cycles if count > POSES). */
